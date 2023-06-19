@@ -10,10 +10,10 @@ app.use(cors());
 app.use(express.json());
 
 var db=mysql.createConnection({
-    host:process.env.host,
-    user:process.env.user,
-    password:process.env.password,
-    database:process.env.database
+  host: process.env.host,
+  user: process.env.user,
+  password: process.env.password,
+  database: process.env.database
 })
 
 db.connect(function(error){

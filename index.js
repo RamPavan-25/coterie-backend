@@ -142,3 +142,4 @@ app.get("/products/:id",async (request,response)=>{
         }
     })
 })
+module.exports=app;

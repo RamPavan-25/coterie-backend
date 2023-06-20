@@ -24,9 +24,8 @@ db.connect(function(error){
 	}
 });
 
-const port = process.env.PORT || 9001;
 
-app.listen(port, () =>
+app.listen(8000, () =>
       console.log("Server Running at http://localhost:8000/")
 );
 
@@ -82,7 +81,7 @@ app.post("/sign-up",async (request,response)=>{
         {
             const createUserQuery = `
             INSERT INTO 
-            login (Username,UserPassword) 
+            Login (Username,UserPassword) 
             VALUES 
             (
                 '${username}', 

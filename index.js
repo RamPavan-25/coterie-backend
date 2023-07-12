@@ -24,8 +24,7 @@ db.connect(function(error){
 	}
 });
 
-
-app.listen(8000, () =>
+app.listen(4500, () =>
       console.log("Server Running at http://localhost:8000/")
 );
 
@@ -141,4 +140,96 @@ app.get("/products/:id",async (request,response)=>{
         }
     })
 })
+
+app.post("/products/:id",async (request,response)=>{
+    const {id}=request.params
+    const {username,quantity,price}=request.body;
+    const q=`SELECT * FROM cart WHERE productId=${id} AND username='${username}'`;
+    db.query(q,async(err,data)=>{
+        if(err)return response.json(err);
+        if(data.length==0)
+        {
+            const insertQuery=`INSERT INTO CART(username,productId,price,count) 
+            VALUES ('${username}',${id},${price},${quantity})`
+            db.query(insertQuery,(err,data)=>{
+                if(err)return response.json(err);
+                else
+                {
+                    const countQuery=`SELECT COUNT(*) FROM CART WHERE username='${username}'`;
+                    db.query(countQuery,(err,data)=>{
+                        if(err)return response.json(err);
+                        return response.json(data[0]["COUNT(*)"]);
+                    })
+                }
+            })
+        }
+        else
+        {
+            const insertQuery=`UPDATE CART SET count=${quantity} WHERE productId=${id} AND username='${username}'`
+            db.query(insertQuery,(err,data)=>{
+                if(err)return response.json(err);
+                else
+                {
+                    const countQuery=`SELECT COUNT(*) FROM CART WHERE username='${username}'`;
+                    db.query(countQuery,(err,data)=>{
+                        if(err)return response.json(err);
+                        return response.json(data[0]["COUNT(*)"]);
+                    })
+                }
+            }) 
+        }
+    }
+)})
+
+app.post("/CartHeaderLength",async(request,response)=>{
+    const {username}=request.body;
+    const countQuery=`SELECT COUNT(*) FROM CART WHERE username='${username}'`;
+    db.query(countQuery,(err,data)=>{
+            if(err)return response.json(err);
+            return response.json(data[0]["COUNT(*)"]);
+    })
+})
+
+app.post('/cartAll',async(request,response)=>{
+    const {username}=request.body;
+    const countQuery=`DELETE FROM CART WHERE username='${username}'`;
+    db.query(countQuery,(err,data)=>{
+            if(err)return response.json(err);
+            return response.json("Success");
+    })
+})
+
+app.post('/cartList',async(request,response)=>{
+    const {username}=request.body;
+    let obj={id:'', title:'', brand:'', quantity:'', price:'', imageUrl:''}
+    const query=`SELECT cart.id,product.title,product.brand,cart.count,cart.price,product.imageUrl
+    FROM CART 
+    INNER JOIN product ON product.id = cart.productID WHERE cart.username='${username}'
+    `;
+    db.query(query,(err,data)=>{
+        if(err)return response.json(err);
+        return response.json(data);
+    })
+})
+
+app.post('/cartItemIncreament',async(request,response)=>{
+    const {username,id,quantity}=request.body;
+    if(quantity!==0)
+    {
+        const insertQuery=`UPDATE CART SET count=${quantity} WHERE id=${id} AND username='${username}'`
+        db.query(insertQuery,(err,data)=>{
+            if(err)return response.json(err);
+            return response.json({username,id,quantity});
+        })
+    }
+    else
+    {
+        const insertQuery=`DELETE FROM CART WHERE id=${id} AND username='${username}'`
+        db.query(insertQuery,(err,data)=>{
+            if(err)return response.json(err);
+            return response.json("sucess");
+        })
+    }
+})
+
 module.exports=app;

@@ -144,7 +144,7 @@ app.get("/products/:id",async (request,response)=>{
 app.post("/products/:id",async (request,response)=>{
     const {id}=request.params
     const {username,quantity,price}=request.body;
-    const q=`SELECT * FROM cart WHERE productId=${id} AND username='${username}'`;
+    const q=`SELECT * FROM CART WHERE productId=${id} AND username='${username}'`;
     db.query(q,async(err,data)=>{
         if(err)return response.json(err);
         if(data.length==0)
@@ -202,9 +202,9 @@ app.post('/cartAll',async(request,response)=>{
 app.post('/cartList',async(request,response)=>{
     const {username}=request.body;
     let obj={id:'', title:'', brand:'', quantity:'', price:'', imageUrl:''}
-    const query=`SELECT cart.id,product.title,product.brand,cart.count,cart.price,product.imageUrl
+    const query=`SELECT CART.id,product.title,product.brand,CART.count,CART.price,product.imageUrl
     FROM CART 
-    INNER JOIN product ON product.id = cart.productID WHERE cart.username='${username}'
+    INNER JOIN product ON product.id = CART.productID WHERE CART.username='${username}'
     `;
     db.query(query,(err,data)=>{
         if(err)return response.json(err);
